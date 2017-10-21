@@ -584,9 +584,9 @@ shaping:
     repair-room: 9575
     repair-npc: clerk
     stock-room: 19306
-    stock-number: 11
-    stock-name: balsa
-    stock-volume: 10
+    stock-number: 10
+    stock-name: maple
+    stock-volume: 5
     pattern-book: shaping
     part-room: 19306
     idle-room:
