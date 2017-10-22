@@ -308,7 +308,9 @@ class Theurgy
 
   def find_seed
     return unless inside?('holy water', @water_holder)
-    walk_to '1032'
+    return if @hometown != 'Crossing' || @hometown != 'Shard'
+    walk_to '1032' if @hometown.eql?'Crossing'
+    walk_to '2789' if @hometown.eql?'Shard'
     exit unless DRRoom.npcs.empty? # Invasion check
     while bput('gather seed', 'You find a tiny', 'This is not a good', 'You come up empty') == 'You come up empty'
       waitrt?
@@ -318,7 +320,8 @@ class Theurgy
   end
 
   def plant_seed
-    walk_to '1031'
+    walk_to '1031' if @hometown.eql?'Crossing'
+    walk_to '6462' if @hometown.eql?'Shard'
     fput('plant seed')
     get_from_container(@water_holder)
     fput("sprinkle #{@water_holder} on room")
