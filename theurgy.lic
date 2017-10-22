@@ -26,6 +26,8 @@ class Theurgy
     fput "stow #{GameObj.right_hand.noun}" if GameObj.right_hand.name != 'Empty'
     fput "stow #{GameObj.left_hand.noun}" if GameObj.left_hand.name != 'Empty'
 
+    walk_to('2801') if @hometown.eql? 'Shard'
+    walk_to('764') if @hometown.eql? 'Crossing'
     forage? 'dirt'
 
     get_from_container(@water_holder)
