@@ -377,6 +377,7 @@ class Theurgy
   end
 
   def reflectory
+    return unless @hometown.eql?('Crossing')
     walk_to '5988'
     fput 'meditate'
     waitrt?
