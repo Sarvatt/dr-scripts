@@ -140,6 +140,9 @@ class Athletics
     return unless exists?('climbing rope')
     return unless exists?('zills')
 
+    if @settings.climbing_rope_song
+      UserVars.climbing_song = @settings.climbing_rope_song
+    end
     UserVars.climbing_song ||= UserVars.song
     echo "UserVars.climbing_song: #{UserVars.climbing_song}" if UserVars.athletics_debug
 

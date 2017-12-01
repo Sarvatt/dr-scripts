@@ -694,6 +694,7 @@ grave_junk:
 
 climbing_target:
 have_climbing_rope: false
+climbing_rope_song:
 # Astrology settings
 astrology_buffs:
 have_telescope: false
