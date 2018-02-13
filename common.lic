@@ -371,4 +371,14 @@ module DRC
 
     g
   end
+
+ def dump_junk?(dump_junk, junk_timer, dump_item_count)
+    return false unless dump_junk
+    return false unless Time.now - junk_timer > 300
+    return false unless DRRoom.room_objs.size > dump_item_count
+
+    fput('dump junk')
+
+    true
+  end
 end
