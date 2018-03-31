@@ -1,4 +1,4 @@
-=begin
+f=begin
   Documentation: https://elanthipedia.play.net/Lich_script_repository#combat-trainer
 =end
 custom_require.call(%w[common common-arcana common-healing common-items common-summoning common-travel drinfomon equipmanager events spellmonitor])
@@ -87,8 +87,8 @@ class SetupProcess
 
     game_state.sheath_whirlwind_offhand
 
-    case bput("#{@warhorn_get_verb} my #{@warhorn}", 'You get', 'You remove', 'What were you referring to', 'You need a free hand', 'Remove what')
-    when 'You get', 'You remove'
+    case bput("#{@warhorn_get_verb} my #{@warhorn}", 'You get', 'You remove', 'You take', 'What were you referring to', 'You need a free hand', 'Remove what')
+    when 'You get', 'You remove', 'You take'
       bput('exhale warhorn lure', 'You sound a series of bursts from the warhorn', 'Your lungs are tired from having sounded a warhorn so recently.')
       @last_warhorn = Time.now
       waitrt?
