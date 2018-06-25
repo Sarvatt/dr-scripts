@@ -24,6 +24,7 @@ class Athletics
       [
         { name: 'wyvern', regex: /^wy.*/i, optional: true, description: 'Climb both undergondola and wyvern cliffs' },
         { name: 'undergondola', regex: /^un.*/i, optional: true, description: 'Climb branch etc undergondola' }
+        { name: 'xalas', regex: /^xala.*/i, optional: true, description: 'Climb xalas in zoluren in instead of undergondola' }
       ]
     ]
 
@@ -31,6 +32,8 @@ class Athletics
 
     if args.wyvern
       climb_wyvern
+    elseif args.xala
+      climb_xalas
     elsif args.undergondola
       climb_branch
     elsif have_climbing_rope
@@ -337,6 +340,20 @@ class Athletics
         train_outdoorsmanship
         train_outdoorsmanship
         train_outdoorsmanship
+        train_outdoorsmanship
+      end
+    end
+  end
+
+  def climb_xalas
+    start_script('skill-recorder') unless Script.running?('skill-recorder')
+    walk_to(6154)
+    until done_training?
+      walk_to(12838)
+      walk_to(6154)
+      break if done_training?
+      walk_to(@outdoorsmanship_rooms.sample) unless @outdoorsmanship_rooms.empty?
+      3.times do
         train_outdoorsmanship
       end
     end
