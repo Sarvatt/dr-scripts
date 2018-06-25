@@ -32,7 +32,7 @@ class Athletics
 
     if args.wyvern
       climb_wyvern
-    elseif args.xala
+    elseif args.xalas
       climb_xalas
     elsif args.undergondola
       climb_branch
