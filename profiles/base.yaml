@@ -333,7 +333,7 @@ alchemy_room:
 use_own_ingot_type:
 deed_own_ingot: false
 crafting_training_spells:
-
+craft_skill_limit: 32
 
 
 # Workorder settings
