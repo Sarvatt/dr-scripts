@@ -2,11 +2,8 @@
 =begin
   Documentation: https://elanthipedia.play.net/Lich_script_development#common
 =end
-
 $ORDINALS = %w[first second third fourth fifth sixth seventh eighth ninth tenth eleventh]
-
 $CURRENCIES = %w[Kronars Lirums Dokoras]
-
 $ENC_MAP = {
   'None' => 0,
   'Light Burden' => 1,
@@ -21,7 +18,6 @@ $ENC_MAP = {
   'Are you even able to move?' => 10,
   'It\'s amazing you aren\'t squashed!' => 11
 }
-
 $NUM_MAP = {
   'zero' => 0,
   'one' => 1,
@@ -52,12 +48,9 @@ $NUM_MAP = {
   'eighty' => 80,
   'ninety' => 90
 }
-
 custom_require.call(%w[spellmonitor drinfomon])
-
 module DRC
   module_function
-
   def bput(message, *matches)
     waitrt?
     log = []
@@ -66,23 +59,26 @@ module DRC
     clear
     put message
     timer = Time.now
-    while (response = get?) || (Time.now - timer < 15)
-
+    while (response = get?) || (Time.now - timer < 5)
       if response.nil?
-        pause 0.1
+        pause 0.01
         next
       end
-
       log += [response]
-
       case response
       when /(?:\.\.\.wait |Wait |\.\.\. wait )([0-9]+)/
-        pause Regexp.last_match(1).to_i
+        rt = (Regexp.last_match(1).to_i)
+        rt = (rt - 1)if rt >= 0.9
+        rt = 0.1 if (rt <= 0)
+        echo("bput #{rt} vs #{(XMLData.roundtime_end.to_f - Time.now.to_f) + ((XMLData.server_time_offset.to_f)*0.75)}") 
+        rt2 = (XMLData.roundtime_end.to_f - Time.now.to_f) + ((XMLData.server_time_offset.to_f)*0.75)
+        rt = rt2 if ((rt2 < rt) && (rt2 >= 0))
+        sleep(rt) unless rt.nil?
         put message
         timer = Time.now
         next
       when /Sorry, you may only type ahead/
-        pause 1
+        pause 0.2
         put message
         timer = Time.now
         next
@@ -103,7 +99,6 @@ module DRC
         timer = Time.now
         next
       end
-
       matches.each do |match|
         if (result = response.match(match))
           return result.to_a.first
@@ -117,7 +112,6 @@ module DRC
     echo "for command #{message}"
     ''
   end
-
   def wait_for_script_to_complete(name, args = [], flags = {})
     verify_script(name)
     before = Script.running.find_all { |s| s.name =~ /#{name}/i }.length
@@ -128,7 +122,6 @@ module DRC
     end
     success
   end
-
   def forage?(item)
     snapshot = "#{right_hand}#{left_hand}"
     while snapshot == "#{right_hand}#{left_hand}"
@@ -145,7 +138,6 @@ module DRC
     end
     true
   end
-
   def collect(item)
     case bput("collect #{item}", 'You manage to collect a pile', 'The room is too cluttered', 'believe you would probably have better luck trying to find a dragon', 'if you had a bit more luck.', 'You cannot collect anything', 'You forage around but are unable to find anything', 'You wander around and poke your fingers', 'You survey the area and realize that any collecting efforts would be futile', 'You are sure you knew', 'You begin to forage around,')
     when 'The room is too cluttered'
@@ -154,15 +146,12 @@ module DRC
     end
     waitrt?
   end
-
   def kick_pile?(item = 'pile')
     fix_standing
     bput("kick #{item}", 'I could not find', 'take a step back and run up to', 'Now what did the .* ever do to you') == 'take a step back and run up to'
   end
-
   def rummage(parameter, container)
     result = DRC.bput("rummage /#{parameter} my #{container}", 'but there is nothing in there like that\.', 'looking for .* and see .*', 'While it\'s closed', 'I don\'t know what you are referring to', 'You feel about')
-
     case result
     when 'You feel about'
       release_invisibility
@@ -170,16 +159,12 @@ module DRC
     when 'but there is nothing in there like that.', 'While it\'s closed', 'I don\'t know what you are referring to'
       return []
     end
-
     text = result.match(/looking for .* and see (.*)\.$/).to_a[1]
-
     list_to_nouns(text)
   end
-
   def get_boxes(container)
     rummage('B', container)
   end
-
   def count_boxes(settings)
     current_box_count = get_boxes(settings.picking_box_source).size
     if settings.picking_pet_box_source != settings.picking_box_source
@@ -187,26 +172,21 @@ module DRC
     end
     current_box_count
   end
-
   def get_skins(container)
     rummage('S', container)
   end
-
   def get_gems(container)
     rummage('G', container)
   end
-
   def get_materials(container)
     rummage('M', container)
   end
-
   # Take a game formatted list "an arrow, silver coins and a deobar strongbox"
   # And return an array ["an arrow", "silver coins", "a deobar strongbox"]
   # is this ever useful compared to the list_to_nouns?
   def list_to_array(list)
     list.strip.split(/,|\sand\s/)
   end
-
   # Take a game formatted list "an arrow, silver coins and a deobar strongbox"
   # And return an array of nouns ["arrow", "coins", "strongbox"]
   def list_to_nouns(list)
@@ -215,16 +195,13 @@ module DRC
       .compact
       .reject { |noun| noun == '' }
   end
-
   def get_noun(long_name)
     long_name.strip.sub(/ with .*| labeled .+/, '').scan(/[a-z\-]+$/i).first
   end
-
   # Items class. Name is the noun of the object. Leather/metal boolean. Is the item worn (defaults to true). Does it hinder lockpicking? (false)
   # Item.new(name:'gloves', leather:true, worn:true, hinders_locks:true, adjective:'ring', bound:true)
   class Item
     attr_accessor :name, :leather, :worn, :hinders_lockpicking, :container, :swappable, :tie_to, :adjective, :bound, :wield, :transforms_to, :transform_verb, :transform_text, :lodges, :skip_repair
-
     def initialize(name: nil, leather: nil, worn: false, hinders_locks: nil, container: nil, swappable: false, tie_to: nil, adjective: nil, bound: false, wield: false, transforms_to: nil, transform_text: nil, transform_verb: nil, lodges: true, skip_repair: false)
       @name = name
       @leather = leather
@@ -242,39 +219,31 @@ module DRC
       @lodges = lodges.nil? ? true : lodges
       @skip_repair = skip_repair
     end
-
     def short_name
       @adjective ? "#{@adjective}.#{@name}" : @name
     end
-
     def short_regex
       @adjective ? /#{adjective}.*\b#{@name}/i : /\b#{@name}/i
     end
   end
-
   # windows only I believe.
   def beep
     echo("\a")
   end
-
   def fix_standing
     loop do
       break if standing?
       bput('stand', 'You stand', 'You are so unbalanced', 'As you stand', 'You are already', 'weight of all your possessions', 'You are overburdened and cannot', 'You\'re unconscious', 'You swim back up into a vertical position', "You don't seem to be able to move to do that", 'prevents you from standing')
     end
   end
-
   def listen?(teacher, observe_flag = false)
     return false if teacher.nil?
     return false if teacher.empty?
-
     bad_classes = %w[Thievery Sorcery]
     bad_classes += ['Life Magic', 'Holy Magic', 'Lunar Magic', 'Elemental Magic', 'Arcane Magic', 'Targeted Magic', 'Arcana', 'Attunement'] if DRStats.barbarian? || DRStats.thief?
     bad_classes += ['Warding'] if DRStats.thief?
     bad_classes += ['Utility'] if DRStats.barbarian?
-
     observe = observe_flag ? 'observe' : ''
-
     case bput("listen to #{teacher} #{observe}", 'begin to listen to \w+ teach the .* skill', 'already listening', 'could not find who', 'You have no idea', 'isn\'t teaching a class', 'don\'t have the appropriate training', 'Your teacher appears to have left', 'isn\'t teaching you anymore', 'experience differs too much from your own', 'but you don\'t see any harm in listening', 'invitation if you wish to join this class')
     when /begin to listen to \w+ teach the (.*) skill/
       return true if bad_classes.grep(/#{Regexp.last_match(1)}/i).empty?
@@ -284,10 +253,8 @@ module DRC
     when 'but you don\'t see any harm in listening'
       bput('stop listening', 'You stop listening')
     end
-
     false
   end
-
   def assess_teach
     case bput('assess teach', 'is teaching a class', 'No one seems to be teaching', 'You are teaching a class')
     when 'No one seems to be teaching', 'You are teaching a class'
@@ -296,7 +263,6 @@ module DRC
     end
     results = reget(20, 'is teaching a class')
     waitrt?
-
     results.each_with_object({}) do |line, hash|
       line.match(/(.*) is teaching a class on (.*) which is still open to new students/) do |match|
         teacher = match[1]
@@ -307,7 +273,6 @@ module DRC
       end
     end
   end
-
   def hide?(hide_type = 'hide')
     unless hiding?
       case bput(hide_type, 'Roundtime', 'too busy performing', 'can\'t see any place to hide yourself', 'Stalk what', 'You\'re already stalking', 'Stalking is an inherently stealthy')
@@ -318,26 +283,22 @@ module DRC
         put 'stop stalk'
         return hide?(hide_type)
       end
-      pause
+#      pause
       waitrt?
     end
     hiding?
   end
-
   def fix_dr_bullshit(string)
     return string if string.split.length <= 2
     string =~ /(\w+) .* (\w+)/
     "#{Regexp.last_match(1)} #{Regexp.last_match(2)}"
   end
-
   def left_hand
     GameObj.left_hand.name == 'Empty' ? nil : fix_dr_bullshit(GameObj.left_hand.name)
   end
-
   def right_hand
     GameObj.right_hand.name == 'Empty' ? nil : fix_dr_bullshit(GameObj.right_hand.name)
   end
-
   def release_invisibility
     get_data('spells')
       .spell_data
@@ -346,17 +307,14 @@ module DRC
       .map { |_name, properties| properties['abbrev'] }
       .each { |abbrev| fput("release #{abbrev}") }
   end
-
   def check_encumbrance(refresh = true)
     bput('encumbrance', 'Encumbrance : .*') if refresh
     $ENC_MAP[DRStats.encumbrance]
   end
-
   def text2num(text_num)
     text_num = text_num.tr('-', ' ')
     split_words = text_num.split(' ')
     g = 0
-
     split_words.each do |word|
       x = $NUM_MAP.fetch(word, nil)
       if word.eql?('hundred') && (g != 0)
@@ -368,7 +326,7 @@ module DRC
         g += x
       end
     end
-
     g
   end
 end
+
