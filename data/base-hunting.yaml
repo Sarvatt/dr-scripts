@@ -21,7 +21,7 @@
 #   - Escort Zones should list a province                                                         #
 #                                                                                                 #
 ###################################################################################################
-
+oo
 escort_zones:
   # https://elanthipedia.play.net/Grave_worm                              90-130
   # Mixed with lower-level wolves. Great swarm.
@@ -96,7 +96,7 @@ hunting_zones:
 ##########                          ZOLUREN                           ##########
 ##########                                                            ##########
 ################################################################################
-
+Foo
   # https://elanthipedia.play.net/Rat                                       0-30
   rats:
   - 6049
