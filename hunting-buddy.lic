@@ -116,6 +116,7 @@ class HuntingBuddy
 
       wait_for_script_to_complete('bescort', @exit) if @exit
       release_cyclics
+      bput("stance set #{settings.default_stance}", 'Setting your')
 
       # Execute scripts to run after the hunt
       execute_actions(after_actions)
