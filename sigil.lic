@@ -33,7 +33,10 @@ class Sigil
     waitrt?
     bput('stow burin', 'You put')
     bput('get sigil book', 'You get')
-    bput('put sigil in sigil book', 'You add', 'You rearrange')
+    case bput('put sigil in sigil book', 'You add', 'You rearrange', 'completely full')
+    when 'completely full'
+      bput('stow sigil', 'You put')
+    end
     bput('stow sigil book', 'You put')
   end
  
